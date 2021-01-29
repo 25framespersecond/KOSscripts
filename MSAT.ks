@@ -707,7 +707,7 @@ lex("Surface", list("ship", "status", "met", "groundspeed", "heading", "electric
 //  +----------------------------------------------------------------------------+
 //Sequence class is used to create and store mission sequence
 function MSATSequence{
-    parameter p_seq is false.
+    parameter p_seq is false, p_deleg is false.
     //Member variables
     local m_sequence is list().
 
@@ -715,6 +715,9 @@ function MSATSequence{
     //#region constructors declaration
     if p_seq:isType("List"){
         listConstructor(p_seq).                 // MSATSequence(List sequence);
+    }
+    else if p_seq:isType("String"){
+        stringConstructor(p_seq, p_deleg).
     }
     else if p_seq:isType("Lexicon"){
         if p_seq:hassuffix("type") and p_seq:type = "MSATSequence"{
@@ -745,6 +748,15 @@ function MSATSequence{
         set m_sequence to listSeq.
     }
 
+    //constructor from string and delegate function
+    function stringConstructor{
+        parameter name, deleg.
+        if not deleg{
+            set deleg to {parameter mission. mission.}.
+        }
+        stepConstructor(MSATStep(name, deleg)).
+    }
+
     //constructor from another sequence
     function seqConstructor{
         parameter seq.
@@ -764,7 +776,7 @@ function MSATSequence{
     //#region method definitions
     //append list of steps or a single step to a sequence
     function append{
-        parameter seq.
+        parameter seq, deleg is false.
         if seq:isType("Lexicon"){
             //append another MSATSequence           
             if seq:hassuffix("type") and seq:type = "MSATSequence"{
@@ -780,6 +792,13 @@ function MSATSequence{
             else if seq:hassuffix("type") and seq:type = "MSATStep"{
                 m_sequence:add(seq).
             }
+        }
+        else if seq:isType("String"){
+            if not deleg{
+                set deleg to {parameter mission. mission.}.
+            }
+            local stp is MSATStep(seq, deleg).
+            m_sequence:add(stp).
         }
         else if seq:isType("List"){         //if argument is a list of steps - append the steps at the end of a sequence
             for elem in seq{
