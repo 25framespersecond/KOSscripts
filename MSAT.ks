@@ -707,7 +707,7 @@ lex("Surface", list("ship", "status", "met", "groundspeed", "heading", "electric
 //  +----------------------------------------------------------------------------+
 //Sequence class is used to create and store mission sequence
 function MSATSequence{
-    parameter p_seq is false, p_deleg is false.
+    parameter p_seq is false, p_deleg is {parameter mission. mission.}.
     //Member variables
     local m_sequence is list().
 
@@ -751,9 +751,6 @@ function MSATSequence{
     //constructor from string and delegate function
     function stringConstructor{
         parameter name, deleg.
-        if not deleg{
-            set deleg to {parameter mission. mission.}.
-        }
         stepConstructor(MSATStep(name, deleg)).
     }
 
@@ -776,7 +773,7 @@ function MSATSequence{
     //#region method definitions
     //append list of steps or a single step to a sequence
     function append{
-        parameter seq, deleg is false.
+        parameter seq, deleg is {parameter mission. mission.}.
         if seq:isType("Lexicon"){
             //append another MSATSequence           
             if seq:hassuffix("type") and seq:type = "MSATSequence"{
@@ -794,9 +791,6 @@ function MSATSequence{
             }
         }
         else if seq:isType("String"){
-            if not deleg{
-                set deleg to {parameter mission. mission.}.
-            }
             local stp is MSATStep(seq, deleg).
             m_sequence:add(stp).
         }
