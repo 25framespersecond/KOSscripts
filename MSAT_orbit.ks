@@ -11,7 +11,7 @@ runOncePath("MSAT_maneuver").
 function MSATOrbit{
     parameter t_alt is false, t_inc is 0, t_lan is false.
     local seq is MSATSequence().
-    seq:append(MSATStep("Store Target Orbit", {
+    seq:append("Store Target Orbit", {
         parameter mission.
         if t_alt:istype("String"){
             set t_alt to mission:readMem(t_alt).
@@ -30,7 +30,7 @@ function MSATOrbit{
         mission:storeMem("t_lan", t_lan).
         mission:storeMem("countdown", 10).
         mission:next().
-    })).
+    }).
     
     //calculate initial orbit based on target nad current location
     seq:append(MSATOrbitPrep()).
@@ -54,7 +54,7 @@ function MSATOrbitPrep{
     local seq is MSATSequence().
 
     //set altitude if undefined
-    seq:append(MSATStep("Define Altitude", {
+    seq:append("Define Altitude", {
         parameter mission.
 
         mission:defineScreenData(MSATPredef:Suborbit).
@@ -75,20 +75,20 @@ function MSATOrbitPrep{
         mission:storeMem("init_alt", t_alt).
         mission:storeMem("turnAngle", getInitialAngle(t_alt)).
         mission:next().
-    })). 
+    }). 
 
     //limit inclination based on ship position
-    seq:append(MSATStep("Limit Inclination",{
+    seq:append("Limit Inclination",{
         parameter mission.
 
         local t_inc is mission:readMem("t_inc").
         local init_inc to limitInclination(t_inc, ship:geoPosition:lat).
         mission:storeMem("init_inc", init_inc).
         mission:next().
-    })).
+    }).
 
     //calculate time to launch based on target longitude of ascending node
-    seq:append(MSATStep("Get Start Time", {
+    seq:append("Get Start Time", {
         parameter mission.
         local t_lan is mission:readMem("t_lan").
         local init_inc is mission:readMem("init_inc").
@@ -121,7 +121,7 @@ function MSATOrbitPrep{
         mission:printMessage("Initial inclination: "+round(init_inc, 2)+"deg.", 4, "beep").
         mission:printMessage("Time to match the longitude of the ascending node of the target orbit: "+round(t)+"s.", 4, "beep").      
         mission:next().
-    })).
+    }).
 
     //wait for all of the messages
     seq:append(MSATwait(12)).
@@ -182,13 +182,13 @@ function MSATGravityTurn{
     local seq is MSATSequence().
     local thrPID is pidLoop(0.05, 0.005, 0.25, 0.1, 1).
     //launch stage until launched
-    seq:append(MSATStep("Launch", {
+    seq:append("Launch", {
         parameter mission.
         //mission:storeMem("thrt", 1.0).
         lock steering to heading(0, 90, 0).
         lock throttle to 1.0.
         mission:next().
-    })).
+    }).
 
     //wait until surface velocity is 75m/s
     seq:append(MSATAutoStage("Start Gravity Turn", {
@@ -208,7 +208,7 @@ function MSATGravityTurn{
     })).
 
     //wait few seconds to start gravity turn
-    seq:append(MSATStep("Wait for Turn", {
+    seq:append("Wait for Turn", {
         parameter mission.
         //when ship is turned to initial turn angle +- 2 deg
         local turnAngle is mission:readMem("turnAngle").
@@ -216,15 +216,15 @@ function MSATGravityTurn{
             mission:eraseMem("turnAngle").
             mission:next().
         }
-    })).
+    }).
 
-    seq:append(MSATStep("Wait for Velocity Vector", {
+    seq:append("Wait for Velocity Vector", {
         parameter mission.
         //when velocity vector matches ship facing +- 2 deg
         if vAng(velocity:surface, ship:facing:vector) <= 2 {
             mission:next().
         }  
-    })).
+    }).
 
     //continue gravity turn
     seq:append(MSATAutoStage("Gravity Turn", {

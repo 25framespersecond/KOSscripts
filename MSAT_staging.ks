@@ -24,13 +24,14 @@ function doSafeStaging{
 function MSATAutoStage{
     parameter name, func.
 
-    local step1 is MSATStep("Save Thrust", {
+    local seq is MSATSequence().
+    seq:append("Save Thrust", {
         parameter mission.
         mission:storeMem("stagethrust", ship:availablethrust).
         mission:next().
     }).
 
-    local step2 is MSATStep(name, {
+    seq:append(name, {
         parameter mission.
         func:call(mission).
         if (ship:availableThrust < (mission:readMem("stagethrust") - 10) or ship:availablethrust = 0 ){
@@ -44,11 +45,11 @@ function MSATAutoStage{
         }
     }).
 
-    local step3 is MSATStep("Clear Memory", {
+    seq:append("Clear Memory", {
         parameter mission.
         mission:eraseMem("stagethrust").
         mission:next().
     }).
 
-    return list(step1, step2, step3).
+    return seq:getSequence().
 }

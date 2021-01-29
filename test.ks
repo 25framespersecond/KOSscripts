@@ -40,7 +40,7 @@ seq:append(MSATorbit(80000, 0)).
 ////seq:append(MSATorbit(80000, target:orbit:inclination, target:orbit:lan)).
 ////seq:append(MSATStep("Clear Mem", {parameter mission. mission:clearMem(). mission:next().})).
 ////seq:append(MSATprint("pirate", 4, "pirate")).
-seq:append(MSATnoop()).
+seq:append("Noop").
 local events is MSATSequence().
 local miss is MSATMission("test", seq, events, MSATPredef:Suborbit).
 miss:run().

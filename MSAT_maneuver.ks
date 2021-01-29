@@ -14,7 +14,7 @@ function MSATexecMnv{
     //get time to maneuver
     //get maneuver execution time
     //get total deltaV
-    seq:append(MSATStep("Maneuver parameters", {
+    seq:append("Maneuver parameters", {
         parameter mission.
         local mnv to nextNode.
         local tMnv is mnv:eta()+time:seconds.
@@ -41,20 +41,20 @@ function MSATexecMnv{
         mission:printMessage("Executing maneuver. DeltaV: "+round(deltaV,2)+"m/s. Execution Time: "+round(tExec)+"s.", 4, "beep").
         mission:addScreenData(list("Manever dV", "m/s", "c_dV")).
         mission:next().
-    })).
+    }).
     
     //turn to maneuver
     seq:append(MSATturnToNode()).
 
     //wait to maneuver start minus some time
-    seq:append(MSATStep("Wait for maneuver", {
+    seq:append("Wait for maneuver", {
         parameter mission.
         local tMnv is mission:readMem("tMnv").
         local tExec is mission:readMem("tExec").
         local waitTime is (tMnv - time:seconds)-tExec/2-10. //wait to maneuver start minus 10s
         mission:storeMem("waitTime", waitTime).
         mission:next().
-    })).
+    }).
     seq:append(MSATwaitWarp("waitTime")).
 
     //turn to maneuver
@@ -62,7 +62,7 @@ function MSATexecMnv{
 
     //wait for maneuver start
     //start maneuver
-    seq:append(MSATStep("Start Maneuver", {
+    seq:append("Start Maneuver", {
         parameter mission.
         local tMnv is mission:readMem("tMnv").
         local tExec is mission:readMem("tExec").
@@ -72,7 +72,7 @@ function MSATexecMnv{
             lock throttle to maxThrottle.
             mission:next().
         }
-    })).
+    }).
 
     //wait for maneuver end (based on delta v)
     seq:append(MSATAutoStage("Execute Maneuver", {

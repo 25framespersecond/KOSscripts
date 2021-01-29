@@ -97,6 +97,6 @@ function MSATcountdown{
 
     //wait for countdown
     local step2 is MSATwait(t).
-    //local step3 is MSATWait(1).
+
     return list(step1, step2).
 }
